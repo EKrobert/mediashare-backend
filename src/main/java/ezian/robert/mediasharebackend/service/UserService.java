@@ -1,7 +1,17 @@
 package ezian.robert.mediasharebackend.service;
 
-import org.springframework.stereotype.Service;
+import ezian.robert.mediasharebackend.model.User;
 
-@Service
-public class UserService {
+import java.util.List;
+
+public interface UserService {
+
+    public List<User> findAll();
+    public User findByUsername(String username);
+    public User findByEmail(String email);
+    public User save(User user);
+    public boolean delete(User user);
+    public User authenticate(String username, String password);
+
+
 }
