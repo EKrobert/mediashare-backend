@@ -9,6 +9,7 @@ public interface UserService {
     public List<User> findAll();
     public User findByUsername(String username);
     public User findByEmail(String email);
+    public User findById(long id);
     public User save(User user);
     public boolean delete(User user);
     public User authenticate(String username, String password);

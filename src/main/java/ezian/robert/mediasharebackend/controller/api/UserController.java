@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-import static javax.swing.UIManager.put;
 
 @RestController
 @RequestMapping("/api/user")
@@ -91,7 +90,7 @@ public class UserController {
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
+        System.out.println(authentication);
         if (authentication == null || !authentication.isAuthenticated()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Non authentifié"));
@@ -102,7 +101,7 @@ public class UserController {
         Map<String, Object> profile = new HashMap<>();
         profile.put("id", user.getId());
         profile.put("email", user.getEmail());
-        put("username", user.getUsername());
+        profile.put("username", user.getUsername());
         profile.put("role", user.getRole());
         profile.put("avatarUrl", user.getAvatarUrl());
 

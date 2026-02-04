@@ -8,4 +8,5 @@ import java.util.List;
 public interface MediaRepository extends JpaRepository<Media,Long> {
 
     List<Media> findAllByUserId(Long userId);
+    List<Media> findByCategoryId(Long categoryId);
 }

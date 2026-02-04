@@ -44,4 +44,14 @@ public class MediaServiceImpl implements MediaService  {
             return true;
          }
     }
+
+    @Override
+    public List<Media> findByUserId(Long userId) {
+        return mediaRepository.findAllByUserId(userId);
+    }
+
+    @Override
+    public List<Media> findByCategoryId(Long categoryId) {
+        return mediaRepository.findByCategoryId(categoryId);
+    }
 }

@@ -39,6 +39,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User findById(long id) {
+        return userRepository.findById(id);
+    }
+
+    @Override
     public User save(User user) {
         return userRepository.save(user);
     }
@@ -51,14 +56,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User authenticate(String email, String password) {
-        User user = userRepository.findByEmail(email);
-        if (user == null) {
-            return null;
+        User user = findByEmail(email);
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            return user;
         }
-        // Vérifier le mot de passe avec BCrypt
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            return null;
-        }
-        return user;
+        return null;
     }
 }

@@ -10,5 +10,7 @@ interface  MediaService {
     public Media findById(Long id);
     public Media save(Media media);
     public boolean delete(Long id);
+    public List <Media> findByUserId(Long userId);
+    public List <Media> findByCategoryId(Long categoryId);
 
 }
