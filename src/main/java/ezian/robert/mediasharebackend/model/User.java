@@ -1,5 +1,6 @@
 package ezian.robert.mediasharebackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,6 +29,7 @@ public class User implements UserDetails {
 
     //user et medias
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private List <Media> medias;
     //user et comment
     @OneToMany(mappedBy = "user")

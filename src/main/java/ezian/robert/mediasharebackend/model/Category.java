@@ -1,5 +1,6 @@
 package ezian.robert.mediasharebackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class Category {
     //..... RELATION......//
     //media
     @OneToMany(mappedBy = "category")
+    @JsonIgnore
     private List <Media> medias;
 
     public Category() {

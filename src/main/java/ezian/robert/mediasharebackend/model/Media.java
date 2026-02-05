@@ -14,8 +14,19 @@ public class Media {
     private String description;
     @Column(name = "media_type", nullable = false)
     private String mediaType;
+    @Column(name = "media_url", nullable = false)
+    private String mediaUrl;
     @Column(name = "thumbnail")
     private String thumbnail;
+    //....RELATIONS......//
+    //user
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    //category
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     public String getMediaUrl() {
         return mediaUrl;
@@ -40,19 +51,6 @@ public class Media {
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
-
-    @Column(name = "media_url", nullable = false)
-    private String mediaUrl;
-
-    //....RELATIONS......//
-    //user
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-    //category
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
 
     public Long getId() {
         return id;

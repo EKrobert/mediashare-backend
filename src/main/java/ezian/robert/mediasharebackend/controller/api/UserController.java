@@ -107,12 +107,4 @@ public class UserController {
 
         return ResponseEntity.ok(profile);
     }
-
-    public static User getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof User) {
-            return (User) authentication.getPrincipal();
-        }
-        return null;
-    }
 }
