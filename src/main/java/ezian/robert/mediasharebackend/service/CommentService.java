@@ -9,6 +9,8 @@ public interface CommentService {
     public List<Comment> findAll();
     public Comment save(Comment comment);
     public List<Comment> findAllByMediaId(Long mediaId);
+    List<Comment> findByMediaId(Long mediaId);
+    Comment findById(Long id);
 
 
 }

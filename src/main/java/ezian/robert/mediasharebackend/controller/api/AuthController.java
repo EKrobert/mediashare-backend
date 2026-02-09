@@ -1,8 +1,13 @@
 package ezian.robert.mediasharebackend.controller.api;
 
 import ezian.robert.mediasharebackend.config.JwtUtil;
+import ezian.robert.mediasharebackend.dto.InscriptionRequest;
+import ezian.robert.mediasharebackend.dto.LoginRequest;
 import ezian.robert.mediasharebackend.model.User;
 import ezian.robert.mediasharebackend.service.UserServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,16 +35,16 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        String password = request.get("password");
-
-        User user = userService.authenticate(email, password);
-
+    @Operation(summary = "Connexion utilisateur", description = "Authentifie un utilisateur et retourne un token JWT")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Connexion réussie"),
+            @ApiResponse(responseCode = "401", description = "Email ou mot de passe incorrect")
+    })
+    public ResponseEntity<?> login(@RequestBody LoginRequest request) {
+        User user = userService.authenticate(request.getEmail(), request.getPassword());
         if (user == null) {
-            Map<String, String> error = new HashMap<>();
-            error.put("message", "Email ou mot de passe incorrect");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("message", "Email ou mot de passe incorrect"));
         }
 
         String token = jwtUtil.generateToken(user.getEmail(), user.getId(), user.getRole());
@@ -50,18 +55,19 @@ public class AuthController {
         response.put("email", user.getEmail());
         response.put("username", user.getUsername());
         response.put("role", user.getRole());
-        response.put("avatarUrl", user.getAvatarUrl());
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/inscription")
-    public ResponseEntity<?> inscription(@RequestBody Map<String, String> request){
+    @Operation(summary = "Inscription utilisateur", description = "Crée un nouveau compte utilisateur")
+    public ResponseEntity<?> inscription(@RequestBody InscriptionRequest request) {
+        // Ton code existant mais utilise request.getEmail(), request.getUsername(), etc.
         try {
             // Validation des champs
-            String email = request.get("email");
-            String username = request.get("username");
-            String password = request.get("password");
+            String email = request.getEmail();
+            String username = request.getUsername();
+            String password = request.getPassword();
 
             if (email == null || email.trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)

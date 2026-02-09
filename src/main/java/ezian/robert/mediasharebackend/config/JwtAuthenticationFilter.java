@@ -28,16 +28,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+        System.out.println("Authorization Header: " + authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
+            System.out.println("Token extracted: " + token);
 
             if (jwtUtil.validateToken(token)) {
+                System.out.println("Token is valid");
                 String email = jwtUtil.extractEmail(token);
+                System.out.println("Email extracted: " + email);
 
                 User user = userService.findByEmail(email);
 
                 if (user != null) {
+                    System.out.println("User found: " + user.getEmail());
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
                                     user,
@@ -47,8 +52,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                     authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    System.out.println("User not found");
                 }
+            } else {
+                System.out.println("Token is invalid");
             }
+        } else {
+            System.out.println("No Bearer token found");
         }
 
         filterChain.doFilter(request, response);

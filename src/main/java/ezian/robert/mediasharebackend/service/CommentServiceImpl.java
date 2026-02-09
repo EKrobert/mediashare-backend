@@ -26,4 +26,14 @@ public class CommentServiceImpl implements CommentService {
     public List<Comment> findAllByMediaId(Long mediaId) {
         return commentRepository.findAllByMediaId(mediaId);
     }
+
+    @Override
+    public List<Comment> findByMediaId(Long mediaId) {
+        return commentRepository.findByMediaId(mediaId);
+    }
+
+    @Override
+    public Comment findById(Long id) {
+        return commentRepository.findById(id).get();
+    }
 }

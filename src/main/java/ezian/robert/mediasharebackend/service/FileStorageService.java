@@ -3,6 +3,8 @@ package ezian.robert.mediasharebackend.service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,6 +18,8 @@ import java.util.UUID;
 
 @Service
 public class FileStorageService {
+
+    private static final Logger logger = LoggerFactory.getLogger(FileStorageService.class);
 
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -32,12 +36,10 @@ public class FileStorageService {
 
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        return uploadDir + "/" +filename;
+        return uploadDir + "/" + filename;
     }
 
-    public String generateVideoThumbnail(MultipartFile videoFile) throws IOException {
-        String videoPath = store(videoFile);
-
+    public String generateVideoThumbnail(String videoPath) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
         String thumbnailFilename = "thumb_" + UUID.randomUUID() + ".jpg";
         Path thumbnailPath = uploadPath.resolve(thumbnailFilename);
@@ -45,7 +47,7 @@ public class FileStorageService {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder(
                     "ffmpeg",
-                    "-i", uploadPath.resolve(videoPath).toString(),
+                    "-i", videoPath,
                     "-ss", "00:00:01.000",
                     "-vframes", "1",
                     "-vf", "scale=320:240",
@@ -56,12 +58,14 @@ public class FileStorageService {
             int exitCode = process.waitFor();
 
             if (exitCode == 0) {
-                return thumbnailFilename;
+                return uploadDir + "/" + thumbnailFilename;
             } else {
+                logger.error("FFmpeg failed with exit code: {}", exitCode);
                 return createPlaceholderThumbnail();
             }
 
         } catch (Exception e) {
+            logger.error("Error generating video thumbnail for: {}", videoPath, e);
             return createPlaceholderThumbnail();
         }
     }
@@ -82,15 +86,14 @@ public class FileStorageService {
 
         ImageIO.write(placeholder, "jpg", placeholderPath.toFile());
 
-        return placeholderFilename;
+        return uploadDir + "/" + placeholderFilename;
     }
 
-    public void delete(String filename) {
+    public void delete(String filePath) {
         try {
-            Path filePath = Paths.get(uploadDir).resolve(filename);
-            Files.deleteIfExists(filePath);
+            Files.deleteIfExists(Paths.get(filePath));
         } catch (IOException e) {
-            // Log error
+            logger.error("Error deleting file: {}", filePath, e);
         }
     }
 }

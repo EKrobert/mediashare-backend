@@ -22,4 +22,18 @@ public class LikeServiceImpl implements LikeService {
     public Like save(Like like) {
         return likeRepository.save(like);
     }
+
+    @Override
+    public Like findByUserIdAndMediaId(Long userId, Long mediaId) {
+        return likeRepository.findByUserIdAndMediaId(userId, mediaId);
+    }
+
+    @Override
+    public int countByMediaId(Long mediaId) {
+        return likeRepository.countByMediaId(mediaId);
+    }
+
+    public void delete(Long id) {
+        likeRepository.deleteById(id);
+    }
 }

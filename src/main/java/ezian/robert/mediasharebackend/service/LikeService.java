@@ -7,5 +7,8 @@ import java.util.List;
 public interface LikeService {
     public List <Like> findAllByMediaId(Long mediaId);
     public Like save(Like like);
+    Like findByUserIdAndMediaId(Long userId, Long mediaId);
+    int countByMediaId(Long mediaId);
+
 
 }

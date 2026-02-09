@@ -97,11 +97,11 @@ public class UserController {
         }
 
         User user = (User) authentication.getPrincipal();
-
+        User user1 = userService.findById(user.getId());
         Map<String, Object> profile = new HashMap<>();
         profile.put("id", user.getId());
         profile.put("email", user.getEmail());
-        profile.put("username", user.getUsername());
+        profile.put("username", user1.getUsername());
         profile.put("role", user.getRole());
         profile.put("avatarUrl", user.getAvatarUrl());
 
