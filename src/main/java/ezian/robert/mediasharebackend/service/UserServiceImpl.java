@@ -18,10 +18,6 @@ public class UserServiceImpl implements UserService {
         this.userRepository = userRepository;
     }
 
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
 
     @Override
     public List<User> findAll() {
@@ -57,6 +53,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public User authenticate(String email, String password) {
         User user = findByEmail(email);
+        System.out.println("Utilisateur trouvé : " + (user != null));
+        System.out.println("Mot de passe correct : " +
+                (user != null && passwordEncoder.matches(password, user.getPassword())));
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             return user;
         }

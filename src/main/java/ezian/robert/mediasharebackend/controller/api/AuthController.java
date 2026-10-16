@@ -65,9 +65,10 @@ public class AuthController {
         // Ton code existant mais utilise request.getEmail(), request.getUsername(), etc.
         try {
             // Validation des champs
-            String email = request.getEmail();
             String username = request.getUsername();
+            String email = request.getEmail();
             String password = request.getPassword();
+            System.out.println("username: " +username+ " email: " +email+ " password: " +password );
 
             if (email == null || email.trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -97,6 +98,7 @@ public class AuthController {
             }
 
             User user = new User();
+            user.setUsername(username);
             user.setEmail(email.trim());
             user.setPassword(passwordEncoder.encode(password));
             user.setRole("USER");
