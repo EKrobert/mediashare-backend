@@ -2,6 +2,12 @@ package ezian.robert.mediasharebackend.controller.api;
 
 import ezian.robert.mediasharebackend.model.User;
 import ezian.robert.mediasharebackend.service.UserServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +22,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/user")
+@Tag(name = "Utilisateurs", description = "Inscription et profil des utilisateurs")
 public class UserController {
     private UserServiceImpl userService;
     private PasswordEncoder passwordEncoder;
@@ -25,6 +32,28 @@ public class UserController {
         this.passwordEncoder=passwordEncoder;
     }
 
+    @Operation(
+            summary = "Créer un compte",
+            description = "Crée un nouvel utilisateur. Les champs email, username et password sont obligatoires. "
+                    + "L'email et le nom d'utilisateur doivent être uniques. Route publique (pas de token)."
+    )
+    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+            description = "Informations du compte à créer",
+            required = true,
+            content = @Content(examples = @ExampleObject(value = """
+                    {
+                      "email": "robert@mediashare.com",
+                      "username": "robert_ezian",
+                      "password": "MotDePasse#2026"
+                    }
+                    """))
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Compte créé avec succès"),
+            @ApiResponse(responseCode = "400", description = "Email, username ou mot de passe manquant"),
+            @ApiResponse(responseCode = "409", description = "Email ou nom d'utilisateur déjà utilisé"),
+            @ApiResponse(responseCode = "500", description = "Erreur lors de la création de l'utilisateur")
+    })
     @PostMapping("/inscription")
     public ResponseEntity<?> inscription(@RequestBody Map<String, String> request){
         try {
@@ -87,6 +116,15 @@ public class UserController {
         }
     }
 
+    @Operation(
+            summary = "Voir mon profil",
+            description = "Retourne l'id, l'email, le username, le rôle et l'avatar de l'utilisateur connecté. "
+                    + "Nécessite un token valide."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Profil de l'utilisateur connecté"),
+            @ApiResponse(responseCode = "401", description = "Non authentifié")
+    })
     @GetMapping("/profile")
     public ResponseEntity<?> getProfile(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

@@ -9,6 +9,7 @@ public interface LikeService {
     public Like save(Like like);
     Like findByUserIdAndMediaId(Long userId, Long mediaId);
     int countByMediaId(Long mediaId);
+    public List<Like> findByUserId(Long userId);
 
 
 }

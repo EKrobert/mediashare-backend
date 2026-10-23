@@ -28,6 +28,14 @@ public class Media {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    //....CHAMPS CALCULÉS (non stockés en base)....//
+    @Transient
+    private int likes;
+    @Transient
+    private int comments;
+    @Transient
+    private boolean liked;
+
     public String getMediaUrl() {
         return mediaUrl;
     }
@@ -90,5 +98,29 @@ public class Media {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public int getComments() {
+        return comments;
+    }
+
+    public void setComments(int comments) {
+        this.comments = comments;
+    }
+
+    public boolean isLiked() {
+        return liked;
+    }
+
+    public void setLiked(boolean liked) {
+        this.liked = liked;
     }
 }

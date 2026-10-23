@@ -36,4 +36,8 @@ public class LikeServiceImpl implements LikeService {
     public void delete(Long id) {
         likeRepository.deleteById(id);
     }
+
+    public List<Like> findByUserId(Long userId){
+        return likeRepository.findByUserId(userId);
+    }
 }

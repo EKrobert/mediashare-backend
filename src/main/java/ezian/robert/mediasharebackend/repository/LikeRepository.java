@@ -9,4 +9,5 @@ public interface LikeRepository extends JpaRepository<Like,Long> {
     List<Like> findAllByMediaId(Long mediaId);
     Like findByUserIdAndMediaId(Long userId, Long mediaId);
     int countByMediaId(Long mediaId);
+    List<Like> findByUserId(Long userId);
 }

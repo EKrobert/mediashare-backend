@@ -7,6 +7,7 @@ import ezian.robert.mediasharebackend.model.User;
 import ezian.robert.mediasharebackend.service.CategoryServiceImpl;
 import ezian.robert.mediasharebackend.service.FileStorageService;
 import ezian.robert.mediasharebackend.service.MediaServiceImpl;
+import ezian.robert.mediasharebackend.service.MediaStatsEnricher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -14,8 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/medias")
@@ -26,13 +29,16 @@ public class MediaController {
     private final MediaServiceImpl mediaService;
     private final CategoryServiceImpl categoryService;
     private final FileStorageService fileStorageService;
+    private final MediaStatsEnricher mediaStats;
 
     public MediaController(MediaServiceImpl mediaService,
                            CategoryServiceImpl categoryService,
-                           FileStorageService fileStorageService) {
+                           FileStorageService fileStorageService,
+                           MediaStatsEnricher mediaStats) {
         this.mediaService = mediaService;
         this.categoryService = categoryService;
         this.fileStorageService = fileStorageService;
+        this.mediaStats = mediaStats;
     }
 
     @PostMapping
@@ -103,6 +109,7 @@ public class MediaController {
         }
     }
 
+    // Vidéos de l'utilisateur connecté, de la plus récente à la plus ancienne
     @GetMapping("/my-medias")
     public ResponseEntity<?> getMyMedias() {
         try {
@@ -112,7 +119,12 @@ public class MediaController {
                         .body(Map.of("error", "Non authentifié"));
             }
 
-            List<Media> medias = mediaService.findByUserId(currentUser.getId());
+            List<Media> medias = mediaService.findByUserId(currentUser.getId()).stream()
+                    .sorted(Comparator.comparing(Media::getId).reversed())
+                    .collect(Collectors.toList());
+
+            mediaStats.enrich(medias, currentUser);
+
             return ResponseEntity.ok(medias);
         } catch (Exception e) {
             logger.error("Error fetching user medias", e);
@@ -121,10 +133,16 @@ public class MediaController {
         }
     }
 
+    // Fil d'actualité, de la vidéo la plus récente à la plus ancienne
     @GetMapping
     public ResponseEntity<?> getAllMedias() {
         try {
-            List<Media> medias = mediaService.findAll();
+            List<Media> medias = mediaService.findAll().stream()
+                    .sorted(Comparator.comparing(Media::getId).reversed())
+                    .collect(Collectors.toList());
+
+            mediaStats.enrich(medias, SecurityUtils.getCurrentUser());
+
             return ResponseEntity.ok(medias);
         } catch (Exception e) {
             logger.error("Error fetching all medias", e);
@@ -137,6 +155,9 @@ public class MediaController {
     public ResponseEntity<?> getMediaById(@PathVariable Long id) {
         try {
             Media media = mediaService.findById(id);
+
+            mediaStats.enrich(media, SecurityUtils.getCurrentUser());
+
             return ResponseEntity.ok(media);
         } catch (Exception e) {
             logger.error("Media not found: {}", id, e);
@@ -150,6 +171,9 @@ public class MediaController {
         try {
             categoryService.findById(categoryId);
             List<Media> medias = mediaService.findByCategoryId(categoryId);
+
+            mediaStats.enrich(medias, SecurityUtils.getCurrentUser());
+
             return ResponseEntity.ok(medias);
         } catch (Exception e) {
             logger.error("Category not found: {}", categoryId, e);
@@ -216,6 +240,9 @@ public class MediaController {
             }
 
             Media updatedMedia = mediaService.save(media);
+
+            mediaStats.enrich(updatedMedia, currentUser);
+
             return ResponseEntity.ok(updatedMedia);
 
         } catch (Exception e) {
